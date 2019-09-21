@@ -5,32 +5,48 @@
       wrap
     >
       <v-flex xs12>
-        <v-img
-          :src="require('../assets/logo.svg')"
-          class="my-3"
-          contain
-          height="200"
-        ></v-img>
+        <v-icon class="my-icon">
+          fa-seedling
+        </v-icon>
       </v-flex>
 
       <v-flex mb-4>
-        <h1 class="display-2 font-weight-bold mb-3">
-          Welcome to AutoGrow UI
+        <h1 class="display-1 font-weight-bold mb-3">
+          Welcome to SmartGrow UI
         </h1>
+        <v-divider class="mt-3"></v-divider>
       </v-flex>
 
-      <v-flex
+      <v-flex 
         xs12
         mb-5
       >
-        <h2 class="headline font-weight-bold mb-3">Tasks</h2>
-    
-        <v-btn block class="my-2">Turn LED on</v-btn>
-        <v-btn block class="my-2">Turn LED off</v-btn>
+        <div class="headline font-weight-bold justify-center">Tasks</div>    
+      </v-flex>
+      <v-flex
+        xs12
+        sm6
+        mb-5
+      >
+        <v-btn block class="green lighten-2 my-2" @click="turnLEDOn">Turn LED on</v-btn>
+      </v-flex>
+      <v-flex
+        xs12
+        sm6
+        mb-5
+      >
+        <v-btn block class="red lighten-2 my-2" @click="turnLEDOff">Turn LED off</v-btn>
       </v-flex>
     </v-layout>	      
   </v-container>
 </template>
+
+<style>
+  .my-icon {
+    font-size: 128px !important;
+    color: #81C784 !important;
+  }
+</style>
 
 <script>
 export default {
@@ -86,5 +102,31 @@ export default {
       },
     ],
   }),
+  methods: {
+    turnLEDOn () {
+      let a = async () => {
+        try {
+          await fetch ('http://192.168.0.125/26/on')
+          alert("LED ligado!")
+        } catch (error) {
+          // alert("Ocorreu um erro!")          
+          console.log(error)
+        }
+      }
+      a()
+    },
+    turnLEDOff () {
+      let a = async () => {
+        try {
+          await fetch ('http://192.168.0.125/26/off')
+          alert("LED ligado!")
+        } catch (error) {
+          // alert("Ocorreu um erro!")          
+          console.log(error)
+        }
+      }
+      a()
+    }
+  }
 };
 </script>
