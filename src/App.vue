@@ -2,8 +2,8 @@
   <v-app>
     <v-app-bar app>
       <v-toolbar-title class="headline text-uppercase">
-        <span>Vuetify</span>
-        <span class="font-weight-light">MATERIAL DESIGN</span>
+        <span>SmartGrow</span>
+        <!-- <span class="font-weight-light"></span> -->
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn
@@ -11,7 +11,7 @@
         href="https://github.com/vuetifyjs/vuetify/releases/latest"
         target="_blank"
       >
-        <span class="mr-2">Latest Release</span>
+        <span class="mr-2">v0.0.1</span>
       </v-btn>
     </v-app-bar>
 
