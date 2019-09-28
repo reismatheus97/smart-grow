@@ -37,6 +37,21 @@
       >
         <v-btn block class="red lighten-2 my-2" @click="turnLEDOff">Turn LED off</v-btn>
       </v-flex>
+
+      <v-flex
+        xs12
+        sm6
+        mb-5
+      >
+        <v-btn block class="green lighten-2 my-2" @click="turnFANOn">Turn FAN on</v-btn>
+      </v-flex>
+      <v-flex
+        xs12
+        sm6
+        mb-5
+      >
+        <v-btn block class="red lighten-2 my-2" @click="turnFANOff">Turn FAN off</v-btn>
+      </v-flex>
     </v-layout>	      
   </v-container>
 </template>
@@ -119,6 +134,30 @@ export default {
       let a = async () => {
         try {
           await fetch ('http://192.168.0.125/26/off')
+          alert("LED ligado!")
+        } catch (error) {
+          // alert("Ocorreu um erro!")          
+          console.log(error)
+        }
+      }
+      a()
+    },
+    turnFANOn () {
+      let a = async () => {
+        try {
+          await fetch ('http://192.168.0.125/27/on')
+          alert("LED ligado!")
+        } catch (error) {
+          // alert("Ocorreu um erro!")          
+          console.log(error)
+        }
+      }
+      a()
+    },
+    turnFANOff () {
+      let a = async () => {
+        try {
+          await fetch ('http://192.168.0.125/27/off')
           alert("LED ligado!")
         } catch (error) {
           // alert("Ocorreu um erro!")          
