@@ -8,7 +8,7 @@
       <v-spacer></v-spacer>
       <v-btn
         text
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
+        href="https://github.com/reismatheus97/smart-grow"
         target="_blank"
       >
         <span class="mr-2">v0.0.1</span>
@@ -16,18 +16,18 @@
     </v-app-bar>
 
     <v-content>
-      <HelloWorld/>
+      <dashboard/>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import Dashboard from './components/Dashboard';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
+    dashboard: Dashboard,
   },
   data: () => ({
     //
