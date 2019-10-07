@@ -1,18 +1,19 @@
 <template>
   <v-app>
     <v-app-bar app>
-      <v-toolbar-title class="headline text-uppercase">
-        <span>SmartGrow</span>
-        <!-- <span class="font-weight-light"></span> -->
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
       <v-btn
         text
         href="https://github.com/reismatheus97/smart-grow"
         target="_blank"
       >
-        <span class="mr-2">v0.0.1</span>
+        <span class="mr-2">SmartGrow v0.0.1</span>
       </v-btn>
+      <v-spacer></v-spacer>
+      <v-system-bar color="transparent">
+        <div class="flex-grow-1"></div>
+        <v-icon>mdi-wifi-strength-4</v-icon>
+        <span>12:30</span>
+      </v-system-bar>
     </v-app-bar>
 
     <v-content>
@@ -29,8 +30,8 @@ export default {
   components: {
     dashboard: Dashboard,
   },
-  data: () => ({
-    //
-  }),
+  created () {
+    this.$vuetify.theme.dark = true
+  },
 };
 </script>
