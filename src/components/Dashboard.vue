@@ -23,8 +23,8 @@
                 <v-progress-circular
                   :rotate="-90"
                   :size="200"
-                  :width="15"
-                  :value="50"
+                  :width="12"
+                  :value="temperature * 2"
                   color="orange lighten-1"
                   class="my-3"
                 >
@@ -32,7 +32,7 @@
                     <v-icon class="task__icon--progress my-4">
                       fa-thermometer-half
                     </v-icon>
-                    <div class="display-1">50<span class="title font-weight-regular">ºC</span></div>
+                    <div class="display-1">{{ temperature }}<span class="title font-weight-regular">ºC</span></div>
                   </div>
                 </v-progress-circular>
               </v-col>
@@ -41,8 +41,8 @@
                 <v-progress-circular
                   :rotate="-90"
                   :size="200"
-                  :width="15"
-                  :value="50"
+                  :width="12"
+                  :value="humidity"
                   color="primary"
                   class="my-3"
                 >
@@ -51,7 +51,7 @@
                       fa-tint
                     </v-icon>
                     <div>
-                      50<span class="title font-weight-regular">%</span>
+                      {{ humidity }}<span class="title font-weight-regular">%</span>
                     </div>
                   </div>
                 </v-progress-circular>
@@ -64,77 +64,80 @@
           <v-col sm="3" class="ma-auto">
             <v-row class="my-5">
               <v-col>
-                <v-icon class="task__icon">
-                  fa-lightbulb
-                </v-icon>
-                <!-- <liquid-gauge :value=90></liquid-gauge> -->
-                <!-- LED OFF -->
-                <!-- <v-icon class="task__icon">
-                  far fa-lightbulb
-                </v-icon> -->
+                <transition name="fade">
+                  <v-icon v-if="ledState" class="task__icon" color="yellow lighten-3">
+                    fa-lightbulb
+                  </v-icon>
+                  <v-icon v-else class="task__icon">
+                    far fa-lightbulb
+                  </v-icon>
+                </transition>
               </v-col>
             </v-row>
             <v-row>
               <div class="headline font-weight-light">
-                Main LED
+                Iluminação
               </div>
-              <v-tabs v-model="ledState" fixed-tabs color="green lighten-2">
-                <v-tabs-slider></v-tabs-slider>
-                <v-tab href="#led-1" @click="turnLEDOn" class="body-1 font-weight-bold" :class="{'v-tab--active': ledState}">
-                  ON
-                </v-tab>
-                <v-tab href="#led-0" @click="turnLEDOn" class="body-1 font-weight-bold" :class="{'v-tab--active': !ledState}">
+            </v-row>
+            <v-row>
+              <v-btn-toggle shaped mandatory color="green lighten-2">
+                <v-btn class="button--grow" :disabled="loading" :input-value="!ledState" @change="toggleLED">
                   OFF
-                </v-tab>
-              </v-tabs>
+                </v-btn>
+                <v-btn class="button--grow" :disabled="loading" :input-value="ledState" @change="toggleLED">
+                  ON
+                </v-btn>
+              </v-btn-toggle>
             </v-row>
           </v-col>
           <v-divider vertical></v-divider>
           <v-col sm="3" class="ma-auto">
             <v-row class="my-5">
               <v-col>
-                <v-icon class="task__icon spinning">
+                <v-icon class="task__icon" :class="{ spinning: fanState }">
                   fa-fan
                 </v-icon>
               </v-col>
             </v-row>
             <v-row>
               <div class="headline font-weight-light">
-                Main FAN
+                Exaustão
               </div>
-              <v-tabs v-model="fanState" fixed-tabs color="green lighten-2">
-                <v-tabs-slider></v-tabs-slider>
-                <v-tab href="#mobile-tabs-5-1" @click="turnFANOn" class="body-1 font-weight-bold">
-                  ON
-                </v-tab>
-                <v-tab href="#mobile-tabs-5-3" @click="turnFANOff" class="body-1 font-weight-bold">
+            </v-row>
+            <v-row>
+              <v-btn-toggle shaped mandatory color="green lighten-2">
+                <v-btn class="button--grow" :disabled="loading" :input-value="!fanState" @change="toggleFAN">
                   OFF
-                </v-tab>
-              </v-tabs>
+                </v-btn>
+                <v-btn class="button--grow" :disabled="loading" :input-value="fanState" @change="toggleFAN">
+                  ON
+                </v-btn>
+              </v-btn-toggle>
             </v-row>
           </v-col>
           <v-divider vertical></v-divider>
           <v-col sm="3" class="ma-auto">
             <v-row class="my-5">
               <v-col>
-                <v-icon class="task__icon">
+                <v-icon class="task__icon" :class="{ 'blue-grey--text text--lighten-1': wpState} ">
                   fa-shower
                 </v-icon>
               </v-col>
             </v-row>
             <v-row>
               <div class="headline font-weight-light">
-                Water Pump
+                Bomba d'água
               </div>
-              <v-tabs fixed-tabs color="green lighten-2">
-                <v-tabs-slider></v-tabs-slider>
-                <v-tab :v-model="false" href="#mobile-tabs-5-1" @click="turnFANOn" class="body-1 font-weight-bold">
-                  ON
-                </v-tab>
-                <v-tab :v-model="true" href="#mobile-tabs-5-3" @click="turnFANOff" class="body-1 font-weight-bold">
+            </v-row>
+            <v-row>
+              <v-btn-toggle v-model="wpState" shaped mandatory color="blue lighten-2">
+                <v-btn class="button--grow" :disabled="loading">
                   OFF
-                </v-tab>
-              </v-tabs>
+                </v-btn>
+                <v-btn class="button--grow" :disabled="loading">
+                  ON
+                </v-btn>
+              </v-btn-toggle>
             </v-row>
           </v-col>
         </v-row>
@@ -159,9 +162,17 @@
     }
   }
 
+  .button--grow {
+    flex-grow: 1 !important;
+  }
+
+  .v-item-group {
+    width: 100%;
+  }
+
   .spinning {
     animation-name: spin;
-    animation-duration: 2000ms;
+    animation-duration: 3000ms;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
   }
@@ -174,12 +185,14 @@
 
 <script>
 /* eslint-disable */
+import http from '@/plugins/http'
 
 export default {
   data: () => ({
+    loading: false,
     ledState: 0,
     fanState: 0,
-    wpState: 1
+    wpState: 0
   }),
   computed: {
     isMobile () {
@@ -193,34 +206,69 @@ export default {
     }
   },
   methods: {
-    async turnLEDOn () {
+    toggleLoading () {
+      this.loading = !this.loading
+    },
+    async toggleLED (value) {
+      this.toggleLoading()
       try {
-        this.ledState = !this.ledState
-        // await fetch ('http://192.168.0.125/26/on')
-        // alert("LED ligado!")
+        const action = this.ledState ? "off" : "on"   // if LED is on, then turn LED off
+        let res = await http.get(`/led/${action}`)
+        console.log(`res >>`, res.data)
+        this.ledState = Number(!this.ledState)
+        this.$store.commit('SET_GROW_DATA', res.data)
+        console.log("O estado do LED foi alterado!")
       } catch (error) {
-        // alert("Ocorreu um erro!")
         console.log(error)
+        this.ledState = this.ledState
+      } finally {
+        this.toggleLoading()
       }
     },
-    async turnFANOn () {
+    async toggleFAN (value) {
+      this.toggleLoading()
       try {
-        await fetch ('http://192.168.0.125/27/on')
-        console.log("FAN ligado!")
+        const action = this.fanState ? "off" : "on"   // if FAN is on, then turn FAN off
+        let res = await http.get(`/fan/${action}`)
+        console.log(`res >>`, res)
+        this.fanState = Number(!this.fanState)
+        console.log("O estado do FAN foi alterado!")
       } catch (error) {
-        // alert("Ocorreu um erro!")
         console.log(error)
+      } finally {
+        this.toggleLoading()
       }
     },
-    async turnFANOn () {
+    async toggleWaterPump (value) {
+      this.toggleLoading()
       try {
-        await fetch ('http://192.168.0.125/27/on')
-        console.log("FAN ligado!")
+        const action = value ? "on" : "off"   // if value is 1, then turn FAN on
+        let res = await http.get(`/water-pump/${action}`)
+        console.log(`res >>`, res)
+        this.wpState = Number(!value)
+        console.log("O estado da Bomba d'agua foi alterado!")
       } catch (error) {
-        // alert("Ocorreu um erro!")
         console.log(error)
+      } finally {
+        this.toggleLoading()
       }
-    }
-  }
+    },
+  },
+  // watch: {
+  //   ledState: {
+  //     handler (val, oldVal) {
+  //       console.log("led val >>", val, oldVal, this.ledState)
+  //       this.toggleLED(val)
+  //     }
+  //   },
+  //   fanState (val) {
+  //     console.log("fan val >>", val)
+  //     this.toggleFAN(val)
+  //   },
+  //   wpState (val) {
+  //     console.log("wp val >>", val)
+  //     this.toggleWaterPump(val)
+  //   }
+  // }
 };
 </script>
