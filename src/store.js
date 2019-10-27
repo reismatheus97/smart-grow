@@ -8,32 +8,37 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     temperature: 50,
-    humidity: 50
+    humidity: 50,
+    ledState: 0,
+    fanState: 0,
+    waterPump: 0
   },
   mutations: {
-    SET_TEMPERATURE (state, payload) {
-      state.temperature = payload
-    },
-    SET_HUMIDITY (state, payload) {
-      state.humidity = payload
+    SET_GROW_DATA (state, payload) {
+      state = payload
     }
   },
   actions: {
     async getGrowData ({ commit }) {
-      let temp, hum;
+      let payload = {} ;
       try {
         let data = await repository.getData()
         console.log(`data fetch >>`, data)
-        temp = data.temp
-        hum  = data.hum
+        payload = {
+          temperature: data.temp,
+          humidity: data.hum,
+          ledState: data.ledState,
+          fanState: data.fanState,
+          waterPump: data.waterPump
+        }
+
       } catch (error) {
-        temp, hum = 0
+        payload = {}
         console.error(error)
       } finally {
-        commit('SET_TEMPERATURE', temp)
-        commit('SET_HUMIDITY', hum)
+        commit('SET_TEMPERATURE', payload)
       }
-      
+
     }
   }
 })
