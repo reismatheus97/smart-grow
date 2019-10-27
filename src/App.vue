@@ -11,8 +11,8 @@
       <v-spacer></v-spacer>
       <v-system-bar color="transparent">
         <div class="flex-grow-1"></div>
-        <v-icon>mdi-wifi-strength-4</v-icon>
-        <span>12:30</span>
+        <!-- <v-icon>mdi-wifi-strength-4</v-icon> -->
+        <span>{{ new Date().toLocaleString() }}</span>
       </v-system-bar>
     </v-app-bar>
 
