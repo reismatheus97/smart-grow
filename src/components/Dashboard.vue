@@ -16,9 +16,6 @@
           </v-col>
         </v-row>
         <v-divider class="mt-5"></v-divider>
-        <!-- <v-col>
-          <div class="display-1 font-weight-light justify-center mt-3">Environment State</div>    
-        </v-col> -->
         <v-row align="center" >
           <v-col sm="12" class="ma-auto pa-0">
             <v-row>
@@ -59,7 +56,7 @@
                   </div>
                 </v-progress-circular>
               </v-col>
-            </v-row> 
+            </v-row>
           </v-col>
         </v-row>
         <v-divider></v-divider>
@@ -72,7 +69,7 @@
                 </v-icon>
                 <!-- <liquid-gauge :value=90></liquid-gauge> -->
                 <!-- LED OFF -->
-                <!-- <v-icon class="task__icon"> 
+                <!-- <v-icon class="task__icon">
                   far fa-lightbulb
                 </v-icon> -->
               </v-col>
@@ -83,11 +80,10 @@
               </div>
               <v-tabs v-model="ledState" fixed-tabs color="green lighten-2">
                 <v-tabs-slider></v-tabs-slider>
-                <v-tab href="#led-1" @click="turnFANOn" class="body-1 font-weight-bold">
+                <v-tab href="#led-1" @click="turnLEDOn" class="body-1 font-weight-bold" :class="{'v-tab--active': ledState}">
                   ON
                 </v-tab>
-      
-                <v-tab href="#led-0" @click="turnFANOff" class="body-1 font-weight-bold">
+                <v-tab href="#led-0" @click="turnLEDOn" class="body-1 font-weight-bold" :class="{'v-tab--active': !ledState}">
                   OFF
                 </v-tab>
               </v-tabs>
@@ -178,10 +174,8 @@
 
 <script>
 /* eslint-disable */
-// import LiquidGauge from './LiquidGauge'
 
 export default {
-  // components: { LiquidGauge },
   data: () => ({
     ledState: 0,
     fanState: 0,
@@ -199,53 +193,33 @@ export default {
     }
   },
   methods: {
-    turnLEDOn () {
-      let a = async () => {
-        try {
-          await fetch ('http://192.168.0.125/26/on')
-          alert("LED ligado!")
-        } catch (error) {
-          // alert("Ocorreu um erro!")          
-          console.log(error)
-        }
+    async turnLEDOn () {
+      try {
+        this.ledState = !this.ledState
+        // await fetch ('http://192.168.0.125/26/on')
+        // alert("LED ligado!")
+      } catch (error) {
+        // alert("Ocorreu um erro!")
+        console.log(error)
       }
-      a()
     },
-    turnLEDOff () {
-      let a = async () => {
-        try {
-          await fetch ('http://192.168.0.125/26/off')
-          alert("LED ligado!")
-        } catch (error) {
-          // alert("Ocorreu um erro!")          
-          console.log(error)
-        }
+    async turnFANOn () {
+      try {
+        await fetch ('http://192.168.0.125/27/on')
+        console.log("FAN ligado!")
+      } catch (error) {
+        // alert("Ocorreu um erro!")
+        console.log(error)
       }
-      a()
     },
-    turnFANOn () {
-      let a = async () => {
-        try {
-          await fetch ('http://192.168.0.125/27/on')
-          console.log("FAN ligado!")
-        } catch (error) {
-          // alert("Ocorreu um erro!")          
-          console.log(error)
-        }
+    async turnFANOn () {
+      try {
+        await fetch ('http://192.168.0.125/27/on')
+        console.log("FAN ligado!")
+      } catch (error) {
+        // alert("Ocorreu um erro!")
+        console.log(error)
       }
-      a()
-    },
-    turnFANOff () {
-      let a = async () => {
-        try {
-          await fetch ('http://192.168.0.125/27/off')
-          console.log("FAN desligado!")
-        } catch (error) {
-          // alert("Ocorreu um erro!")          
-          console.log(error)
-        }
-      }
-      a()
     }
   }
 };
