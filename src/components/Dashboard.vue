@@ -64,14 +64,12 @@
           <v-col sm="3" class="ma-auto">
             <v-row class="my-5">
               <v-col>
-                <transition name="fade">
-                  <v-icon v-if="ledState" class="task__icon" color="yellow lighten-3">
-                    fa-lightbulb
-                  </v-icon>
-                  <v-icon v-else class="task__icon">
-                    far fa-lightbulb
-                  </v-icon>
-                </transition>
+                <v-icon v-if="Number(ledState)" class="task__icon" color="yellow lighten-3">
+                  fa-lightbulb
+                </v-icon>
+                <v-icon v-else class="task__icon">
+                  far fa-lightbulb
+                </v-icon>
               </v-col>
             </v-row>
             <v-row>
@@ -81,11 +79,11 @@
             </v-row>
             <v-row>
               <v-btn-toggle shaped mandatory color="green lighten-2">
-                <v-btn class="button--grow" :disabled="loading" :input-value="!ledState" @change="toggleLED">
-                  OFF
+                <v-btn class="button--grow" :disabled="loading" v-bind:value="!Number(ledState)" @change="toggleLED">
+                  off
                 </v-btn>
-                <v-btn class="button--grow" :disabled="loading" :input-value="ledState" @change="toggleLED">
-                  ON
+                <v-btn class="button--grow" :disabled="loading" v-bind:value="Number(ledState)" @change="toggleLED">
+                  on
                 </v-btn>
               </v-btn-toggle>
             </v-row>
@@ -94,7 +92,7 @@
           <v-col sm="3" class="ma-auto">
             <v-row class="my-5">
               <v-col>
-                <v-icon class="task__icon" :class="{ spinning: fanState }">
+                <v-icon class="task__icon" :class="{ spinning: Number(fanState) }">
                   fa-fan
                 </v-icon>
               </v-col>
@@ -106,11 +104,11 @@
             </v-row>
             <v-row>
               <v-btn-toggle shaped mandatory color="green lighten-2">
-                <v-btn class="button--grow" :disabled="loading" :input-value="!fanState" @change="toggleFAN">
-                  OFF
+                <v-btn class="button--grow" :disabled="loading" v-bind:value="!Number(fanState)" @change="toggleFAN">
+                  off
                 </v-btn>
-                <v-btn class="button--grow" :disabled="loading" :input-value="fanState" @change="toggleFAN">
-                  ON
+                <v-btn class="button--grow" :disabled="loading" v-bind:value="Number(fanState)" @change="toggleFAN">
+                  on
                 </v-btn>
               </v-btn-toggle>
             </v-row>
@@ -130,12 +128,12 @@
               </div>
             </v-row>
             <v-row>
-              <v-btn-toggle v-model="wpState" shaped mandatory color="blue lighten-2">
-                <v-btn class="button--grow" :disabled="loading">
-                  OFF
+              <v-btn-toggle shaped mandatory color="blue lighten-2">
+                <v-btn class="button--grow" :disabled="loading" v-bind:value="!wpState" @change="toggleFAN">
+                  off
                 </v-btn>
-                <v-btn class="button--grow" :disabled="loading">
-                  ON
+                <v-btn class="button--grow" :disabled="loading" v-bind:value="wpState" @change="toggleFAN">
+                  on
                 </v-btn>
               </v-btn-toggle>
             </v-row>
@@ -188,11 +186,11 @@
 import http from '@/plugins/http'
 
 export default {
+  async created () {
+    await this.$store.dispatch(`getGrowData`)
+  },
   data: () => ({
-    loading: false,
-    ledState: 0,
-    fanState: 0,
-    wpState: 0
+    loading: false
   }),
   computed: {
     isMobile () {
@@ -203,36 +201,42 @@ export default {
     },
     humidity () {
       return this.$store.state.humidity
-    }
+    },
+    ledState () {
+      return this.$store.state.ledState
+    },
+    fanState () {
+      return this.$store.state.fanState
+    },
+    wpState () {
+      return this.$store.state.wpState
+    },
   },
   methods: {
     toggleLoading () {
       this.loading = !this.loading
     },
-    async toggleLED (value) {
+    async toggleLED (e) {
       this.toggleLoading()
       try {
-        const action = this.ledState ? "off" : "on"   // if LED is on, then turn LED off
+        console.log(`e >>`, e)
+        const action = Number(this.ledState) ? "off" : "on"   // if LED is on, then turn LED off
         let res = await http.get(`/led/${action}`)
         console.log(`res >>`, res.data)
-        this.ledState = Number(!this.ledState)
         this.$store.commit('SET_GROW_DATA', res.data)
-        console.log("O estado do LED foi alterado!")
       } catch (error) {
         console.log(error)
-        this.ledState = this.ledState
       } finally {
         this.toggleLoading()
       }
     },
-    async toggleFAN (value) {
+    async toggleFAN (e) {
       this.toggleLoading()
       try {
-        const action = this.fanState ? "off" : "on"   // if FAN is on, then turn FAN off
+        const action = Number(this.fanState) ? "off" : "on"   // if FAN is on, then turn FAN off
         let res = await http.get(`/fan/${action}`)
-        console.log(`res >>`, res)
-        this.fanState = Number(!this.fanState)
-        console.log("O estado do FAN foi alterado!")
+        console.log(`res >>`, res.data)
+        this.$store.commit('SET_GROW_DATA', res.data)
       } catch (error) {
         console.log(error)
       } finally {
@@ -245,7 +249,7 @@ export default {
         const action = value ? "on" : "off"   // if value is 1, then turn FAN on
         let res = await http.get(`/water-pump/${action}`)
         console.log(`res >>`, res)
-        this.wpState = Number(!value)
+        // this.wpState = Number(!value)
         console.log("O estado da Bomba d'agua foi alterado!")
       } catch (error) {
         console.log(error)

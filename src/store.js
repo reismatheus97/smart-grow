@@ -24,13 +24,12 @@ export default new Vuex.Store({
       try {
         let data = await repository.getData()
         console.log(`data fetch >>`, data)
-        payload = { ...data }
-
+        payload = data
       } catch (error) {
         payload = {}
         console.error(error)
       } finally {
-        commit('SET_TEMPERATURE', payload)
+        commit('SET_GROW_DATA', payload)
       }
     }
   }
