@@ -12,10 +12,14 @@ export default new Vuex.Store({
     ledState: 0,
     fanState: 0,
     waterPump: 0
+    // soilHumidity: 0,
   },
   mutations: {
     SET_GROW_DATA (state, payload) {
       Object.assign(state, payload)
+    },
+    SET_WATER_PUMP (state, payload) {
+      state.waterPump = payload
     }
   },
   actions: {
@@ -26,7 +30,13 @@ export default new Vuex.Store({
         console.log(`data fetch >>`, data)
         payload = data
       } catch (error) {
-        payload = {}
+        payload = {
+          temperature: 0,
+          humidity: 0,
+          ledState: 0,
+          fanState: 0,
+          waterPump: 0
+        }
         console.error(error)
       } finally {
         commit('SET_GROW_DATA', payload)

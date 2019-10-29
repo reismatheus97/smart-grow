@@ -74,18 +74,8 @@
             </v-row>
             <v-row>
               <div class="headline font-weight-light">
-                Iluminação
+                Iluminação <v-switch v-model="ledState" inset color="green lighten-2" :loading="loading" class="d-inline-block"></v-switch>
               </div>
-            </v-row>
-            <v-row>
-              <v-btn-toggle shaped mandatory color="green lighten-2">
-                <v-btn class="button--grow" :disabled="loading" v-bind:value="!Number(ledState)" @change="toggleLED">
-                  off
-                </v-btn>
-                <v-btn class="button--grow" :disabled="loading" v-bind:value="Number(ledState)" @change="toggleLED">
-                  on
-                </v-btn>
-              </v-btn-toggle>
             </v-row>
           </v-col>
           <v-divider vertical></v-divider>
@@ -99,25 +89,15 @@
             </v-row>
             <v-row>
               <div class="headline font-weight-light">
-                Exaustão
+                Exaustão <v-switch v-model="fanState" inset color="green lighten-2" :loading="loading" class="d-inline-block"></v-switch>
               </div>
-            </v-row>
-            <v-row>
-              <v-btn-toggle shaped mandatory color="green lighten-2">
-                <v-btn class="button--grow" :disabled="loading" v-bind:value="!Number(fanState)" @change="toggleFAN">
-                  off
-                </v-btn>
-                <v-btn class="button--grow" :disabled="loading" v-bind:value="Number(fanState)" @change="toggleFAN">
-                  on
-                </v-btn>
-              </v-btn-toggle>
             </v-row>
           </v-col>
           <v-divider vertical></v-divider>
           <v-col sm="3" class="ma-auto">
             <v-row class="my-5">
               <v-col>
-                <v-icon class="task__icon" :class="{ 'blue-grey--text text--lighten-1': wpState} ">
+                <v-icon class="task__icon" :class="{ 'blue--text text--lighten-1': wpState} ">
                   fa-shower
                 </v-icon>
               </v-col>
@@ -128,14 +108,7 @@
               </div>
             </v-row>
             <v-row>
-              <v-btn-toggle shaped mandatory color="blue lighten-2">
-                <v-btn class="button--grow" :disabled="loading" v-bind:value="!wpState" @change="toggleFAN">
-                  off
-                </v-btn>
-                <v-btn class="button--grow" :disabled="loading" v-bind:value="wpState" @change="toggleFAN">
-                  on
-                </v-btn>
-              </v-btn-toggle>
+              <v-switch v-model="fanState" inset color="blue lighten-2"></v-switch>
             </v-row>
           </v-col>
         </v-row>
@@ -143,6 +116,86 @@
     </v-row>
   </v-container>
 </template>
+
+<script>
+/* eslint-disable */
+import http from '@/plugins/http'
+
+export default {
+  async mounted () {
+    await this.$store.dispatch(`getGrowData`)
+
+    setInterval(async () => {
+      this.toggleLoading()
+      await this.$store.dispatch(`getGrowData`)
+      this.toggleLoading()
+    }, 8000)
+  },
+  data: () => ({
+    loading: false
+  }),
+  computed: {
+    isMobile () {
+      return this.$vuetify.breakpoint.xsOnly
+    },
+    temperature () {
+      return this.$store.state.temperature
+    },
+    humidity () {
+      return this.$store.state.humidity
+    },
+    // soilHumidity () {
+    //   return this.$store.state.soilHumidity
+    // },
+    ledState: {
+      get () {
+        return Number(this.$store.state.ledState)
+      },
+      set (val) { this.toggleComponent(val, "led") }
+    },
+    fanState: {
+      get () { return Number(this.$store.state.fanState) },
+      set (val) { this.toggleComponent(val, "fan") }
+    },
+    wpState: {
+      get () { return this.$store.state.wpState },
+      // async set (val) {
+      //   await this.toggleComponent("on", "water-pump")
+      //   setTimeout(() => {
+      //     this.$store.commit('SET_WATER_PUMP', 1)
+      //   }, 3000)
+      // }
+    }
+  },
+  methods: {
+    toggleLoading () {
+      this.loading = !this.loading
+    },
+    async toggleComponent (val, component) {
+      this.toggleLoading()
+      try {
+        const action = val ? "on" : "off"                     // if val is on, then turn on
+        let res = await http.get(`/${component}/${action}`)   // dinamically hits a component and its
+        // console.log(`res >>`, res.data)
+        this.$store.commit('SET_GROW_DATA', res.data)
+      } catch (error) {
+        console.log(error)
+        this.$store.commit('SET_GROW_DATA', {
+          temperature: 0,
+          humidity: 30,
+          ledState: 1,
+          fanState: 1,
+          waterPump: 0
+        })
+        // await this.$store.dispatch(`getGrowData`)
+      } finally {
+        this.toggleLoading()
+      }
+    },
+  }
+};
+</script>
+
 
 <style lang="scss">
   .welcome-icon {
@@ -180,99 +233,3 @@
     to {transform:rotate(360deg);}
   }
 </style>
-
-<script>
-/* eslint-disable */
-import http from '@/plugins/http'
-
-export default {
-  async created () {
-    await this.$store.dispatch(`getGrowData`)
-  },
-  data: () => ({
-    loading: false
-  }),
-  computed: {
-    isMobile () {
-      return this.$vuetify.breakpoint.xsOnly
-    },
-    temperature () {
-      return this.$store.state.temperature
-    },
-    humidity () {
-      return this.$store.state.humidity
-    },
-    ledState () {
-      return this.$store.state.ledState
-    },
-    fanState () {
-      return this.$store.state.fanState
-    },
-    wpState () {
-      return this.$store.state.wpState
-    },
-  },
-  methods: {
-    toggleLoading () {
-      this.loading = !this.loading
-    },
-    async toggleLED (e) {
-      this.toggleLoading()
-      try {
-        console.log(`e >>`, e)
-        const action = Number(this.ledState) ? "off" : "on"   // if LED is on, then turn LED off
-        let res = await http.get(`/led/${action}`)
-        console.log(`res >>`, res.data)
-        this.$store.commit('SET_GROW_DATA', res.data)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.toggleLoading()
-      }
-    },
-    async toggleFAN (e) {
-      this.toggleLoading()
-      try {
-        const action = Number(this.fanState) ? "off" : "on"   // if FAN is on, then turn FAN off
-        let res = await http.get(`/fan/${action}`)
-        console.log(`res >>`, res.data)
-        this.$store.commit('SET_GROW_DATA', res.data)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.toggleLoading()
-      }
-    },
-    async toggleWaterPump (value) {
-      this.toggleLoading()
-      try {
-        const action = value ? "on" : "off"   // if value is 1, then turn FAN on
-        let res = await http.get(`/water-pump/${action}`)
-        console.log(`res >>`, res)
-        // this.wpState = Number(!value)
-        console.log("O estado da Bomba d'agua foi alterado!")
-      } catch (error) {
-        console.log(error)
-      } finally {
-        this.toggleLoading()
-      }
-    },
-  },
-  // watch: {
-  //   ledState: {
-  //     handler (val, oldVal) {
-  //       console.log("led val >>", val, oldVal, this.ledState)
-  //       this.toggleLED(val)
-  //     }
-  //   },
-  //   fanState (val) {
-  //     console.log("fan val >>", val)
-  //     this.toggleFAN(val)
-  //   },
-  //   wpState (val) {
-  //     console.log("wp val >>", val)
-  //     this.toggleWaterPump(val)
-  //   }
-  // }
-};
-</script>
