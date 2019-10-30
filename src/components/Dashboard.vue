@@ -5,16 +5,16 @@
         <v-row justify="center">
           <v-col xs="12" sm="2">
             <v-icon class="welcome-icon d-flex">
-              fa-seedling
+              mdi-sprout
             </v-icon>
           </v-col>
           <v-col xs12 sm="6" align-self="center">
-            <span class="d-flex" :class="isMobile ? 'display-2' : 'display-4'">
+            <span class="d-flex" :class="isMobile ? 'display-3 justify-center pb-9' : 'display-4'">
               SmartGrow
             </span>
           </v-col>
         </v-row>
-        <v-divider class="mt-5"></v-divider>
+        <v-divider v-if="!isMobile" class="mt-5"></v-divider>
         <v-row align="center" class="flex-column flex-sm-row">
           <v-col sm="12" class="ma-auto pa-0">
             <v-row class="flex-sm-row flex-wrap" justify="center">
@@ -29,13 +29,13 @@
                 >
                   <div class="display-1">
                     <v-icon class="task__icon--progress my-4">
-                      fa-thermometer-half
+                      mdi-thermometer
                     </v-icon>
                     <div class="display-1">{{ temperature }}<span class="title font-weight-regular">ºC</span></div>
                   </div>
                 </v-progress-circular>
               </v-col>
-              <v-divider vertical></v-divider>
+              <v-divider v-if="!isMobile" vertical></v-divider>
               <v-col sm="5" md="3">
                 <v-progress-circular
                   :rotate="-90"
@@ -47,7 +47,7 @@
                 >
                   <div class="display-1">
                     <v-icon class="task__icon--progress my-3">
-                      fa-tint
+                      mdi-water
                     </v-icon>
                     <div>
                       {{ humidity }}<span class="title font-weight-regular">%</span>
@@ -55,28 +55,30 @@
                   </div>
                 </v-progress-circular>
               </v-col>
-              <v-divider vertical></v-divider>
+              <v-divider v-if="!isMobile" vertical></v-divider>
               <v-col sm="5" md="3">
                 <v-progress-circular
                   :rotate="-90"
                   :size="200"
                   :width="12"
-                  :value="temperature * 2"
-                  color="orange lighten-1"
+                  :value="soilHumidity"
+                  color="primary lighten-1"
                   class="my-3"
                 >
                   <div class="display-1">
                     <v-icon class="task__icon--progress my-4">
-                      fa-thermometer-half
+                      mdi-cup-water
                     </v-icon>
-                    <div class="display-1">{{ temperature }}<span class="title font-weight-regular">ºC</span></div>
+                    <div>
+                      {{ soilHumidity }}<span class="title font-weight-regular">%</span>
+                    </div>
                   </div>
                 </v-progress-circular>
               </v-col>
             </v-row>
           </v-col>
         </v-row>
-        <v-divider></v-divider>
+        <v-divider v-if="!isMobile"></v-divider>
         <v-row align="center" class="flex-column flex-sm-row">
           <v-col sm="3" class="ma-auto">
             <v-row class="my-5">
@@ -84,10 +86,10 @@
                 <div>
                   <transition name="fade-transition">
                     <v-icon v-if="Number(ledState)" class="task__icon" color="yellow lighten-3">
-                      fa-lightbulb
+                      mdi-lightbulb-on
                     </v-icon>
                     <v-icon v-else class="task__icon">
-                      far fa-lightbulb
+                      mdi-lightbulb-outline
                     </v-icon>
                   </transition>
                 </div>
@@ -106,14 +108,19 @@
               </v-btn-toggle>
             </v-row>
           </v-col>
-          <v-divider vertical></v-divider>
+          <v-divider v-if="!isMobile" vertical></v-divider>
           <v-col sm="3" class="ma-auto">
             <v-row class="my-5">
               <v-col class="task__icon--container">
                 <div>
-                  <v-icon class="task__icon" :class="{ spinning: Number(fanState) }">
-                    fa-fan
-                  </v-icon>
+                  <transition name="fade-transition">
+                    <v-icon v-if="Number(fanState)" class="task__icon" :class="{ spinning: Number(fanState) }">
+                      mdi-fan
+                    </v-icon>
+                    <v-icon v-else class="task__icon">
+                      mdi-fan-off
+                    </v-icon>
+                  </transition>
                 </div>
                 <v-switch v-model="fanState" inset color="green accent-2" readonly :loading="loading" class="d-inline-block"></v-switch>
               </v-col>
@@ -130,22 +137,27 @@
               </v-btn-toggle>
             </v-row>
           </v-col>
-          <v-divider vertical></v-divider>
+          <v-divider v-if="!isMobile" vertical></v-divider>
           <v-col sm="3" class="ma-auto">
             <v-row class="my-5">
               <v-col class="task__icon--container">
-                <div>
-                  <v-icon class="task__icon" :class="{ 'blue--text text--lighten-1': wpState} ">
-                    fa-shower
-                  </v-icon>
+                <div class="mb-5">
+                  <transition name="fade-transition">
+                    <v-icon v-if="Number(wpState)" class="task__icon" :class="{ flash: Number(wpState) }">
+                      mdi-water-pump
+                    </v-icon>
+                    <v-icon v-else class="task__icon">
+                      mdi-water-pump-off
+                    </v-icon>
+                  </transition>
                 </div>
-                <v-switch v-model="fanState" inset color="green accent-2" readonly :loading="loading" class="d-inline-block"></v-switch>
+                <!-- <v-switch v-model="wpState" inset color="green accent-2" readonly :loading="loading" class="d-inline-block"></v-switch> -->
               </v-col>
             </v-row>
             <v-row>
               <div class="headline py-2 d-inline-block text-truncate">Irrigação</div>
               <v-btn-toggle>
-                <v-btn class="task__btn" @click="toggleComponent('on', 'led')">
+                <v-btn class="task__btn" @click="pulseWaterPump()">
                   PULSAR
                 </v-btn>
               </v-btn-toggle>
@@ -163,7 +175,10 @@ import http from '@/plugins/http'
 
 export default {
   async mounted () {
+    this.$store.commit('TOGGLE_APP_LOADING')
+    await this.timeout(3000);
     await this.$store.dispatch(`getGrowData`)
+    this.$store.commit('TOGGLE_APP_LOADING')
 
     setInterval(async () => {
       this.toggleLoading()
@@ -171,12 +186,15 @@ export default {
       this.toggleLoading()
     }, 15000)
   },
-  data: () => ({
-    loading: false
-  }),
+  data () {
+    return { wpState: false }
+  },
   computed: {
     isMobile () {
       return this.$vuetify.breakpoint.xsOnly
+    },
+    loading () {
+      return this.$store.state.loading
     },
     temperature () {
       return this.$store.state.temperature
@@ -184,54 +202,49 @@ export default {
     humidity () {
       return this.$store.state.humidity
     },
-    // soilHumidity () {
-    //   return this.$store.state.soilHumidity
-    // },
+    soilHumidity () {
+      return this.$store.state.soilHumidity
+    },
     ledState: {
       get () {
         return Number(this.$store.state.ledState)
       },
-      // set (val) { this.toggleComponent(val, "led") }
     },
     fanState: {
       get () { return Number(this.$store.state.fanState) },
-      // set (val) { this.toggleComponent(val, "fan") }
     },
-    wpState: {
-      get () { return this.$store.state.wpState },
-      // async set (val) {
-      //   await this.toggleComponent("on", "water-pump")
-      //   setTimeout(() => {
-      //     this.$store.commit('SET_WATER_PUMP', 1)
-      //   }, 3000)
-      // }
-    }
   },
   methods: {
-    toggleLoading () {
-      this.loading = !this.loading
+    timeout(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     },
-    async toggleComponent (val, component) {
+    toggleLoading () {
+      this.$store.commit('TOGGLE_LOADING')
+    },
+    async toggleComponent (action, component) {
       this.toggleLoading()
       try {
-        const action = val ? "on" : "off"                     // if val is on, then turn on
         let res = await http.get(`/${component}/${action}`)   // dinamically hits a component and its
-        // console.log(`res >>`, res.data)
+        console.log(`res >>`, res.data)
         this.$store.commit('SET_GROW_DATA', res.data)
       } catch (error) {
         console.log(error)
-        this.$store.commit('SET_GROW_DATA', {
-          temperature: 0,
-          humidity: 30,
-          ledState: 1,
-          fanState: 1,
-          waterPump: 0
-        })
-        // await this.$store.dispatch(`getGrowData`)
+        await this.$store.dispatch(`getGrowData`)
       } finally {
         this.toggleLoading()
       }
     },
+    async pulseWaterPump () {
+      this.wpState = true
+      try {
+        http.get(`/water-pump/on`)
+      } catch (error) {
+        console.error("Fail on /water-pump", error)
+      } finally {
+        await this.timeout(5000)
+        this.wpState = false
+      }
+    }
   }
 };
 </script>
@@ -273,7 +286,7 @@ export default {
 
   .task__icon {
     font-size: 110px !important;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     display: block !important;
 
     &--container {

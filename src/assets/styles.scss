@@ -2,3 +2,18 @@
     font-family: 'Khand', sans-serif;
     src: url('./fonts/Khand/Khand-SemiBold.ttf'), url('./fonts/Khand/Khand-Bold.ttf'), url('./fonts/Khand/Khand-Light.ttf'), url('./fonts/Khand/Khand-Medium.ttf'), url('./fonts/Khand/Khand-Regular.ttf')
 }
+
+@font-face {
+    font-family: 'Roboto';
+    src:  url('./fonts/Roboto/Roboto-Regular.ttf')
+}
+
+// url('./fonts/Roboto/Roboto-Black.ttf'),
+//     url('./fonts/Roboto/Roboto-BlackItalic.ttf'),
+//     url('./fonts/Roboto/Roboto-Bold.ttf'),
+//     url('./fonts/Roboto/Roboto-BoldItalic.ttf'),
+//     url('./fonts/Roboto/Roboto-Italic.ttf'),
+//     url('./fonts/Roboto/Roboto-Light.ttf'),
+//     url('./fonts/Roboto/Roboto-Medium.ttf'),
+
+@import '~@mdi/font/css/materialdesignicons.min.css';

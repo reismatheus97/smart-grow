@@ -9,16 +9,23 @@
         <span class="mr-2">SmartGrow v0.0.1</span>
       </v-btn>
       <v-spacer></v-spacer>
-      <v-system-bar color="transparent">
+      <v-system-bar dense color="transparent">
         <div class="flex-grow-1"></div>
         <!-- <v-icon>mdi-wifi-strength-4</v-icon> -->
-        <span>{{ new Date().toLocaleString() }}</span>
+        <span>{{ currentDate }}</span>
       </v-system-bar>
     </v-app-bar>
 
     <v-content>
       <dashboard/>
     </v-content>
+    <v-overlay :value="appLoading" opacity="0.90" class="text-center">
+      <v-progress-circular indeterminate size="300" width="8" color="green">
+        <h3 class="display-1 my-12">
+          Sincronizando...
+        </h3>
+      </v-progress-circular>
+    </v-overlay>
   </v-app>
 </template>
 
@@ -33,5 +40,13 @@ export default {
   created () {
     this.$vuetify.theme.dark = true
   },
+  computed: {
+    currentDate () {
+      return this.$store.state.currentDate
+    },
+    appLoading () {
+      return this.$store.state.appLoading || false   
+    }
+  }
 };
 </script>
